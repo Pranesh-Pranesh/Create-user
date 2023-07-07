@@ -1,0 +1,234 @@
+import React, { useState } from 'react';
+
+// Initial state for the form fields
+const initialFormState = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  mobile: '',
+  address1: '',
+  address2: '',
+  state: '',
+  city: '',
+  country: '',
+  zipCode: '',
+};
+
+const App = () => {
+  // State variables
+  const [users, setUsers] = useState([]);
+  const [formValues, setFormValues] = useState(initialFormState);
+  const [errors, setErrors] = useState({});
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
+  // Validate form fields
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {};
+
+    // Validate first name
+    if (formValues.firstName.trim().length < 5) {
+      newErrors.firstName = 'First name must be at least 5 characters long';
+      isValid = false;
+    }
+
+    // Validate last name
+    if (formValues.lastName.trim().length < 5) {
+      newErrors.lastName = 'Last name must be at least 5 characters long';
+      isValid = false;
+    }
+
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formValues.email.trim())) {
+      newErrors.email = 'Invalid email address';
+      isValid = false;
+    }
+
+    // Validate mobile number
+    const mobileRegex = /^\d{10}$/; // Assuming 10-digit mobile numbers
+    if (!mobileRegex.test(formValues.mobile.trim())) {
+      newErrors.mobile = 'Invalid mobile number';
+      isValid = false;
+    }
+
+    // Validate address 1
+    if (!formValues.address1.trim()) {
+      newErrors.address1 = 'Address 1 is required';
+      isValid = false;
+    }
+
+    // Validate zip code
+    const zipCodeRegex = /^\d+$/;
+    if (!zipCodeRegex.test(formValues.zipCode.trim())) {
+      newErrors.zipCode = 'Invalid zip code';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      // Create new user object with form values
+      const newUser = {
+        ...formValues,
+        id: Date.now(), // Assign a unique ID (you can use a library like uuid)
+      };
+
+      // Add the new user to the list
+      setUsers([...users, newUser]);
+
+      // Reset the form
+      setFormValues(initialFormState);
+      setErrors({});
+    }
+  };
+
+  // Handle user deletion
+  const handleDeleteUser = (id) => {
+    setUsers(users.filter((user) => user.id !== id));
+  };
+
+  return (
+    <div>
+      <h1>User Form</h1>
+
+      {/* User form */}
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>First Name:</label>
+          <input
+            type="text"
+            name="firstName"
+            value={formValues.firstName}
+            onChange={handleInputChange}
+          />
+          {errors.firstName && <p>{errors.firstName}</p>}
+        </div>
+
+        <div>
+          <label>Last Name:</label>
+          <input
+            type="text"
+            name="lastName"
+            value={formValues.lastName}
+            onChange={handleInputChange}
+          />
+          {errors.lastName && <p>{errors.lastName}</p>}
+        </div>
+
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={formValues.email}
+            onChange={handleInputChange}
+          />
+          {errors.email && <p>{errors.email}</p>}
+        </div>
+
+        <div>
+          <label>Mobile:</label>
+          <input
+            type="tel"
+            name="mobile"
+            value={formValues.mobile}
+            onChange={handleInputChange}
+          />
+          {errors.mobile && <p>{errors.mobile}</p>}
+        </div>
+
+        <div>
+          <label>Address 1:</label>
+          <input
+            type="text"
+            name="address1"
+            value={formValues.address1}
+            onChange={handleInputChange}
+          />
+          {errors.address1 && <p>{errors.address1}</p>}
+        </div>
+
+        <div>
+          <label>Address 2:</label>
+          <input
+            type="text"
+            name="address2"
+            value={formValues.address2}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <label>State:</label>
+          <input
+            type="text"
+            name="state"
+            value={formValues.state}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <label>City:</label>
+          <input
+            type="text"
+            name="city"
+            value={formValues.city}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <label>Country:</label>
+          <input
+            type="text"
+            name="country"
+            value={formValues.country}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <label>Zip Code:</label>
+          <input
+            type="text"
+            name="zipCode"
+            value={formValues.zipCode}
+            onChange={handleInputChange}
+          />
+          {errors.zipCode && <p>{errors.zipCode}</p>}
+        </div>
+
+        <button type="submit">Create User</button>
+      </form>
+
+      {/* User list */}
+      <h2>User List</h2>
+      {users.length === 0 ? (
+        <p>No users available.</p>
+      ) : (
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>
+              {user.firstName} {user.lastName}
+              <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export default App;
